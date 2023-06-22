@@ -6,7 +6,7 @@ import {
   UserIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
-import { NavLink, Outlet } from "react-router-dom";
+import { NavLink, Navigate, Outlet } from "react-router-dom";
 import { useStateContext } from "../context/ContexProvider";
 
 const navigation = [
@@ -19,13 +19,16 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
-const logout = (event) => {
-  event.preventDefault();
-  console.log(24324);
-};
-
 export function DefaultLayout() {
-  const { currentUser } = useStateContext();
+  const { currentUser, userToken } = useStateContext();
+
+  if (!userToken) {
+    return <Navigate to="/login" />;
+  }
+  const logout = (event) => {
+    event.preventDefault();
+    console.log(24324);
+  };
   return (
     <>
       <div className="min-h-full">
