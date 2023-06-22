@@ -1,5 +1,5 @@
 import { Navigate, createBrowserRouter } from "react-router-dom";
-import { Dashboard, Login, SignUp, Surveys } from "./views";
+import { Dashboard, Login, SignUp, SurveyView, Surveys } from "./views";
 import { GuestLayout } from "./components";
 import {DefaultLayout} from "./components/DefaultLayout";
 
@@ -19,6 +19,10 @@ const router = createBrowserRouter([
             {
                 path: "/surveys",
                 element: <Surveys />
+            },
+            {
+                path: "/surveys/create",
+                element: <SurveyView />
             },
         ]
     },
