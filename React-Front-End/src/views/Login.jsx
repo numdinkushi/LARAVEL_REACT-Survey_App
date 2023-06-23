@@ -1,14 +1,58 @@
-import React from "react";
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
+import axiosClient from "../axios";
+import { useStateContext } from "../context/ContexProvider";
 
 export const Login = () => {
+  const {setCurrentUser, setUserToken} = useStateContext();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [errors, setErrors] = useState({ __html: "" });
+
+  const onSubmit = (event) => {
+    event.preventDefault();
+    setErrors({ __html: "" });
+
+    axiosClient
+      .post("/login", {
+        email: email,
+        password: password,
+      })
+      .then(({ data }) => {
+        console.log(111, data)
+        setCurrentUser(data.user);
+        setUserToken(data.token);
+      })
+      .catch((error) => {
+        if (error.response) {
+          const finalErrors = Object.values(error.response.data.errors).reduce((accum, next) => [...accum, ...next], [])
+          console.log(finalErrors)
+          setErrors({__html: finalErrors.join('<br>')})
+        }
+
+        console.log(error);
+      });
+  };
+
   return (
     <>
       <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
         Login with your account
       </h2>
-
+      <p className="text-center mt-2 text-sm text-gray-600">
+        Or{" "}
+        <Link
+          to="/signUp"
+          className="font-medium text-indigo-600 hover:text-indigo-500"
+        >
+          {" "}
+        Create new Account
+        </Link>
+      </p>
       <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-        <form className="space-y-6" action="#" method="POST">
+      {errors.__html && (<div className="bg-red-500 rounded py-2 px-3 mt-2 text-white" dangerouslySetInnerHTML={errors}>
+      </div>)}
+        <form onSubmit={onSubmit} className="space-y-6" action="#" method="POST">
           <div>
             <label
               htmlFor="email"
@@ -21,6 +65,8 @@ export const Login = () => {
                 id="email"
                 name="email"
                 type="email"
+                value={email}
+                onChange={(event)=> setEmail(event.target.value)}
                 autoComplete="email"
                 required
                 className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
@@ -50,6 +96,8 @@ export const Login = () => {
                 id="password"
                 name="password"
                 type="password"
+                value={password}
+                onChange={(event)=> setPassword(event.target.value)}
                 autoComplete="current-password"
                 required
                 className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
