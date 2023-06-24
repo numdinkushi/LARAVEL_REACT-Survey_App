@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { PageComponent } from "../components";
 import { PrimaryButton } from "../components/core/PrimaryButton";
 import { PhotoIcon, PlusCircleIcon } from "@heroicons/react/24/outline";
+import axiosClient from "../axios";
 
 export const SurveyView = () => {
   const [survey, setSurvey] = useState({
@@ -15,8 +16,17 @@ export const SurveyView = () => {
     questions: [],
   });
 
-  const onSubmit = () => {
+  const onSubmit = (event) => {
+    event.preventDefault();
 
+    axiosClient.post('/survey', {
+      'title': 'dummy stuff',
+      'description': 'dummy test',
+      'expire_date': '11/07/23',
+      'status': true,
+      'slug': 'sdfiojfs'
+
+    })
   };
 
   const addQuestion = () => {
@@ -29,7 +39,7 @@ export const SurveyView = () => {
   };
   return (
     <PageComponent title="Create New Survey">
-      <form action="#" method="POST" onSubmit={onSubmit}>
+      <form action="#" method="POST" onSubmit={(event)=>onSubmit(event)}>
         <div className="shadow sm:overflow-hidden sm:rounded-md">
           <div className="space-y-6 bg-white px-4 py-5 sm:p-6">
             {/* image */}

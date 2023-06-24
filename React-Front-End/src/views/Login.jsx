@@ -25,11 +25,11 @@ export const Login = () => {
       })
       .catch((error) => {
         if (error.response) {
-          const finalErrors = Object.values(error.response.data.errors).reduce((accum, next) => [...accum, ...next], [])
-          console.log(finalErrors)
-          setErrors({__html: finalErrors.join('<br>')})
+          const E1 = Object.values(error.response.data);
+          const E2 = [...E1];
+          console.log(E2);
+          setErrors({__html: E2})
         }
-
         console.log(error);
       });
   };
