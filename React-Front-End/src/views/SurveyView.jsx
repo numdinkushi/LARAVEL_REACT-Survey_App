@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { PageComponent } from "../components";
+import { PageComponent, SurveyQuestions } from "../components";
 import { PrimaryButton } from "../components/core/PrimaryButton";
 import { PhotoIcon, PlusCircleIcon } from "@heroicons/react/24/outline";
 import { useNavigate } from "react-router-dom";
@@ -62,6 +62,11 @@ export const SurveyView = () => {
     };
     reader.readAsDataURL(file);
   };
+
+  const onSurveyUpdate = (survey) =>{
+      setSurvey({...survey});
+  };
+
   return (
     <PageComponent title="Create New Survey">
       <form action="#" method="POST" onSubmit={(event) => onSubmit(event)}>
@@ -187,7 +192,7 @@ export const SurveyView = () => {
               </div>
             </div>
             {/*Active*/}
-
+                  <SurveyQuestions survey={survey} onSurveyUpdate={onSurveyUpdate}/>
             <button type="button" onClick={addQuestion}>
               Add question
             </button>

@@ -3,6 +3,7 @@ import { createContext, useContext, useState } from "react";
 const StateContext = createContext({
   currentUser: {},
   surveys: [],
+  questionTypes: [],
   setSurvey: () => {},
   setCurrentUser: () => {},
   userToken: null,
@@ -191,6 +192,7 @@ export const ContextProvder = ({ children }) => {
 
   const [userToken, _setUserToken] = useState(localStorage.getItem('TOKEN') || '');
   const [surveys, setSurveys] = useState(tmpSurveys);
+  const [questionTypes, setQuestionTypes] = useState(["text", "select", "checkbox", "textarea", "radio"]);
 
   const setUserToken = (token) =>{
     if(token){
@@ -209,6 +211,7 @@ export const ContextProvder = ({ children }) => {
         userToken,
         setUserToken,
         surveys,
+        questionTypes,
       }}
     >
       {children}
