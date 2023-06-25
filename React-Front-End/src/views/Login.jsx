@@ -19,7 +19,6 @@ export const Login = () => {
         password: password,
       })
       .then(({ data }) => {
-        console.log(111, data)
         setCurrentUser(data.user);
         setUserToken(data.token);
       })

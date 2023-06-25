@@ -31,27 +31,32 @@ class SurveyController extends Controller
 
     }
 
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \App\Http\Requests\StoreSurveyRequest  $request
+     * @return \Illuminate\Http\Response
+     */
     public function store(StoreSurveyRequest $request)
     {
         $data = $request->validated();
-        
-        
-        //check if image was given and save to local file system
-        if(isset($data['image'])){
+
+        // Check if image was given and save on local file system
+        if (isset($data['image'])) {
             $relativePath = $this->saveImage($data['image']);
             $data['image'] = $relativePath;
         }
 
         $survey = Survey::create($data);
 
-        foreach($data['questions'] as $question){
+        // Create new questions
+        foreach ($data['questions'] as $question) {
             $question['survey_id'] = $survey->id;
             $this->createQuestion($question);
         }
 
         return new SurveyResource($survey);
     }
-
 
     public function show(Survey $survey, Request $request)
     {
@@ -63,53 +68,59 @@ class SurveyController extends Controller
         return new SurveyResource($survey);
     }
 
-
+  /**
+     * Update the specified resource in storage.
+     *
+     * @param  \App\Http\Requests\UpdateSurveyRequest  $request
+     * @param  \App\Models\Survey  $survey
+     * @return \Illuminate\Http\Response
+     */
     public function update(UpdateSurveyRequest $request, Survey $survey)
     {
         $data = $request->validated();
 
-        //check if image exists and save on local file storage
-        if(isset($data['image'])){
+        // Check if image was given and save on local file system
+        if (isset($data['image'])) {
             $relativePath = $this->saveImage($data['image']);
             $data['image'] = $relativePath;
-        }
 
-        //check for old image and delete
-        if($survey->image){
-            $absolutePath = public_path($survey->image);
-            File::delete($absolutePath);
+            // If there is an old image, delete it
+            if ($survey->image) {
+                $absolutePath = public_path($survey->image);
+                File::delete($absolutePath);
+            }
         }
 
         $survey->update($data);
 
-        $existingIds = $survey->questions->pluck('id')->toArray();   //get ids as plain array of existing questions
+        $existingIds = $survey->questions()->pluck('id')->toArray();   // Get ids as plain array of existing questions
+        
+        $newIds = Arr::pluck($data['questions'], 'id'); // Get ids as plain array of new questions
+        
+        $toDelete = array_diff($existingIds, $newIds); // Find questions to delete
+       
+        $toAdd = array_diff($newIds, $existingIds);  //Find questions to add
 
-        $newIds = Arr::pluck($data['questions'], 'id'); //get ids as plain array of new questions
-   
-        $toDelete = array_diff($newIds, $existingIds);   //find questions to delete
+        SurveyQuestion::destroy($toDelete);  // Delete questions by $toDelete array
 
-        $toAdd = array_diff($existingIds, $newIds); //find questions to add
-
-        SurveyQuestion::destroy($toDelete);
-
-        //create new questions
-        foreach($data['questions'] as $question){
-            if(in_array($question['id'], $toAdd)){
+        // Create new questions
+        foreach ($data['questions'] as $question) {
+            if (in_array($question['id'], $toAdd)) {
                 $question['survey_id'] = $survey->id;
                 $this->createQuestion($question);
             }
         }
 
+        // Update existing questions
         $questionMap = collect($data['questions'])->keyBy('id');
-
-        foreach($survey->questions as $questions){
-            if(isset($questionMap[$question->id])){
+        foreach ($survey->questions as $question) {
+            if (isset($questionMap[$question->id])) {
                 $this->updateQuestion($question, $questionMap[$question->id]);
             }
         }
+
         return new SurveyResource($survey);
     }
-
     public function destroy(Survey $survey, Request $request)
     {
         $user  = $request->user();
@@ -130,35 +141,38 @@ class SurveyController extends Controller
 
     private function saveImage($image)
     {
-        //check if image is valid base 64 string
-        if(preg_match('/^data:image\/(\w+);base64,/', $image, $type)){
-            $image = substr($image, strpos($image, ',') + 1); //take out base 64 encoded without the meme type
-            $type = strtolower($type[1]); //jpg, png, gif
+        // Check if image is valid base64 string
+        if (preg_match('/^data:image\/(\w+);base64,/', $image, $type)) {
+           
+            $image = substr($image, strpos($image, ',') + 1); // Take out the base64 encoded text without mime type
+            
+            $type = strtolower($type[1]); // Get file extension, jpg, png, gif
 
-            if(!in_array($type, ['jpg', 'jpeg', 'gif', 'png'])){
+            // Check if file is an image
+            if (!in_array($type, ['jpg', 'jpeg', 'gif', 'png'])) {
                 throw new \Exception('invalid image type');
             }
             $image = str_replace(' ', '+', $image);
             $image = base64_decode($image);
 
-            if($image === false){
+            if ($image === false) {
                 throw new \Exception('base64_decode failed');
             }
-        }else{
-            throw new \Exception('Did not match data URI with image data');
+        } else {
+            throw new \Exception('did not match data URI with image data');
         }
 
         $dir = 'images/';
-        $file = Str::random() . '.' .$type;
+        $file = Str::random() . '.' . $type;
         $absolutePath = public_path($dir);
-        if(!File::exists($absolutePath)){
+        $relativePath = $dir . $file;
+        if (!File::exists($absolutePath)) {
             File::makeDirectory($absolutePath, 0755, true);
         }
         file_put_contents($relativePath, $image);
 
         return $relativePath;
     }
-
     private function createQuestion($data)
     {
         if(is_array($data['data'])){

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { PageComponent } from "../components";
 import { PrimaryButton } from "../components/core/PrimaryButton";
 import { PhotoIcon, PlusCircleIcon } from "@heroicons/react/24/outline";
+import { useNavigate } from "react-router-dom";
 import axiosClient from "../axios";
 
 export const SurveyView = () => {
@@ -16,31 +17,61 @@ export const SurveyView = () => {
     questions: [],
   });
 
+  const [errors, setErrors] = useState({ __html: "" });
+  const navigate = useNavigate();
+
   const onSubmit = (event) => {
     event.preventDefault();
 
-    axiosClient.post('/survey', {
-      'title': 'dummy stuff',
-      'description': 'dummy test',
-      'expire_date': '11/07/23',
-      'status': true,
-      'slug': 'sdfiojfs'
+    const payload = { ...survey };
 
-    })
+    if (payload.image) {
+      console.log(payload.image_url);
+      payload.image = payload.image_url;
+
+      delete payload.image_url;
+    }
+
+    axiosClient
+      .post("/survey", payload)
+      .then((res) => {
+        navigate("/surveys");
+      })
+      .catch((error) => {
+        if (error && error.response) {
+          const displayError = Object.values(error.response.data.errors);
+          setErrors({ __html: displayError[0] });
+        }
+      });
   };
 
-  const addQuestion = () => {
+  const addQuestion = () => {};
 
-  };
-  
+  const onImageChoose = (event) => {
+    const file = event.target.files[0];
 
-  const onImageChoose = () => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      setSurvey({
+        ...survey,
+        image: file,
+        image_url: reader.result,
+      });
 
+      event.target.value = "";
+    };
+    reader.readAsDataURL(file);
   };
   return (
     <PageComponent title="Create New Survey">
-      <form action="#" method="POST" onSubmit={(event)=>onSubmit(event)}>
+      <form action="#" method="POST" onSubmit={(event) => onSubmit(event)}>
         <div className="shadow sm:overflow-hidden sm:rounded-md">
+          {errors.__html && (
+            <div
+              className="bg-red-500 rounded py-3 px-3 mt-2 text-white"
+              dangerouslySetInnerHTML={errors}
+            ></div>
+          )}
           <div className="space-y-6 bg-white px-4 py-5 sm:p-6">
             {/* image */}
             <div>
@@ -75,102 +106,99 @@ export const SurveyView = () => {
             </div>
             {/* title */}
             <div className="col-span-6 sm:col-span-3">
-                <label
-                  htmlFor="title"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Survey Title
-                </label>
+              <label
+                htmlFor="title"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Survey Title
+              </label>
+              <input
+                type="text"
+                name="title"
+                id="title"
+                value={survey.title}
+                onChange={(ev) =>
+                  setSurvey({ ...survey, title: ev.target.value })
+                }
+                placeholder="Survey Title"
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+              />
+            </div>
+            {/*Description*/}
+            <div className="col-span-6 sm:col-span-3">
+              <label
+                htmlFor="description"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Description
+              </label>
+              {/* <pre>{ JSON.stringify(survey, undefined, 2) }</pre> */}
+              <textarea
+                name="description"
+                id="description"
+                value={survey.description || ""}
+                onChange={(ev) =>
+                  setSurvey({ ...survey, description: ev.target.value })
+                }
+                placeholder="Describe your survey"
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+              ></textarea>
+            </div>
+            {/*Expire Date*/}
+            <div className="col-span-6 sm:col-span-3">
+              <label
+                htmlFor="expire_date"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Expire Date
+              </label>
+              <input
+                type="date"
+                name="expire_date"
+                id="expire_date"
+                value={survey.expire_date}
+                onChange={(ev) =>
+                  setSurvey({ ...survey, expire_date: ev.target.value })
+                }
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+              />
+            </div>
+            {/*Active*/}
+            <div className="flex items-start">
+              <div className="flex h-5 items-center">
                 <input
-                  type="text"
-                  name="title"
-                  id="title"
-                  value={survey.title}
+                  id="status"
+                  name="status"
+                  type="checkbox"
+                  checked={survey.status}
                   onChange={(ev) =>
-                    setSurvey({ ...survey, title: ev.target.value })
+                    setSurvey({ ...survey, status: ev.target.checked })
                   }
-                  placeholder="Survey Title"
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                  className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
                 />
               </div>
-                {/*Description*/}
-                <div className="col-span-6 sm:col-span-3">
-                <label
-                  htmlFor="description"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Description
+              <div className="ml-3 text-sm">
+                <label htmlFor="comments" className="font-medium text-gray-700">
+                  Active
                 </label>
-                {/* <pre>{ JSON.stringify(survey, undefined, 2) }</pre> */}
-                <textarea
-                  name="description"
-                  id="description"
-                  value={survey.description || ""}
-                  onChange={(ev) =>
-                    setSurvey({ ...survey, description: ev.target.value })
-                  }
-                  placeholder="Describe your survey"
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                ></textarea>
+                <p className="text-gray-500">
+                  Whether to make survey publicly available
+                </p>
               </div>
-              {/*Expire Date*/}
-              <div className="col-span-6 sm:col-span-3">
-                <label
-                  htmlFor="expire_date"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Expire Date
-                </label>
-                <input
-                  type="date"
-                  name="expire_date"
-                  id="expire_date"
-                  value={survey.expire_date}
-                  onChange={(ev) =>
-                    setSurvey({ ...survey, expire_date: ev.target.value })
-                  }
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                />
-              </div>
-               {/*Active*/}
-               <div className="flex items-start">
-                <div className="flex h-5 items-center">
-                  <input
-                    id="status"
-                    name="status"
-                    type="checkbox"
-                    checked={survey.status}
-                    onChange={(ev) =>
-                      setSurvey({ ...survey, status: ev.target.checked })
-                    }
-                    className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                  />
-                </div>
-                <div className="ml-3 text-sm">
-                  <label
-                    htmlFor="comments"
-                    className="font-medium text-gray-700"
-                  >
-                    Active
-                  </label>
-                  <p className="text-gray-500">
-                    Whether to make survey publicly available
-                  </p>
-                </div>
-              </div>
-              {/*Active*/}
+            </div>
+            {/*Active*/}
 
-              <button type="button" onClick={addQuestion}>
-                Add question
-              </button>
-              {/* <SurveyQuestions
+            <button type="button" onClick={addQuestion}>
+              Add question
+            </button>
+            {/* <SurveyQuestions
                 questions={survey.questions}
                 onQuestionsUpdate={onQuestionsUpdate}
               /> */}
           </div>
           <div className="bg-gray-50 px-4 py-3 text-right sm:px-6">
-              <PrimaryButton>Save</PrimaryButton>
-            </div>
+            <PrimaryButton>Save</PrimaryButton>
+          </div>
         </div>
       </form>
     </PageComponent>
