@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreSurveyRequest;
-use App\Http\Enums\QuestionTypeEnum;
+use App\Enums\QuestionTypeEnum;
 use App\Http\Requests\UpdateSurveyRequest;
 use App\Http\Resources\SurveyResource;
 use App\Models\Survey;
@@ -15,6 +15,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str; 
 use Illuminate\Validation\Rules\Enum;
 use Illuminate\Support\Arr;
+use Illuminate\Validation\Rule;
 
 class SurveyController extends Controller
 {

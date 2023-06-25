@@ -45,8 +45,6 @@ export const SurveyView = () => {
       });
   };
 
-  const addQuestion = () => {};
-
   const onImageChoose = (event) => {
     const file = event.target.files[0];
 
@@ -193,9 +191,7 @@ export const SurveyView = () => {
             </div>
             {/*Active*/}
                   <SurveyQuestions survey={survey} onSurveyUpdate={onSurveyUpdate}/>
-            <button type="button" onClick={addQuestion}>
-              Add question
-            </button>
+ 
             {/* <SurveyQuestions
                 questions={survey.questions}
                 onQuestionsUpdate={onQuestionsUpdate}

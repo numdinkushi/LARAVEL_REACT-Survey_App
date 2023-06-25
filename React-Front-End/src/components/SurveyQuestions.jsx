@@ -6,18 +6,21 @@ import {QuestionEditor} from "./QuestionEditor";
 export const SurveyQuestions = ({ survey, onSurveyUpdate }) => {
   const [model, setModel] = useState({ ...survey });
 
-  const addQuestion = () => {
+  const addQuestion = (index) => {
+    index = index != undefined ? undefined : model.questions.length;
+    // debugger
+    model.questions.splice(index, 0, {
+      id: uuidv4(),
+      type: "text",
+      question: "",
+      description: "",
+      data: {},
+    });
+
     setModel({
       ...model,
       questions: [
         ...model.questions,
-        {
-          id: uuidv4(),
-          type: "text",
-          question: "",
-          description: "",
-          data: {},
-        },
       ],
     });
   };
@@ -47,7 +50,7 @@ export const SurveyQuestions = ({ survey, onSurveyUpdate }) => {
 
   useEffect(() => {
     onSurveyUpdate(model);
-  }, [model]);
+  }, [model.questions]);
   
   return (
     <>
