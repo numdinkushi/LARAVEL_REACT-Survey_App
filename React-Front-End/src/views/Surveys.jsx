@@ -1,38 +1,73 @@
-import React from "react";
-import { PageComponent } from "../components";
+import React, { useEffect, useState } from "react";
+import { PageComponent, PaginationLinks } from "../components";
 import { useStateContext } from "../context/ContexProvider";
 import { SurveyListItem } from "../components/SurveyListItem";
-import { PrimaryButton } from '../components/core/PrimaryButton';
+import { PrimaryButton } from "../components/core/PrimaryButton";
 import { PlusCircleIcon } from "@heroicons/react/24/outline";
-
+import axiosClient from "../axios";
 
 export const Surveys = () => {
-  const { surveys } = useStateContext();
+  const [surveys, setSurveys] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [meta, setMeta] = useState({});
+
   const onDeleteClick = () => {
     console.log(surveys);
   };
+
+  const onPageClick = (link) => {
+    console.log('clicked')
+      getSurveys(link.url);
+  }
+
+  const getSurveys = async (url) => {
+    url = url || '/survey'
+    try {
+      setLoading(true);
+      const result = await axiosClient.get(url);
+      if (result.data) {
+        console.log(result);
+        setSurveys(result.data.data);
+        setMeta(result.data.meta);
+        setLoading(false);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    getSurveys();
+  }, []);
+
   return (
     <>
       <PageComponent
         title="Surveys"
-        buttons={ (
+        buttons={
           <PrimaryButton color="green" to="/surveys/create">
             <PlusCircleIcon className="h-6 w-6 mr-2" />
             Create New
           </PrimaryButton>
-  )}
+        }
       >
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 md:grid-cols-3">
-          {surveys.map((survey) => {
-            return (
-              <SurveyListItem
-                survey={survey}
-                key={survey?.id}
-                onDeleteClick={onDeleteClick}
-              />
-            );
-          })}
-        </div>
+        {loading && <div className="tex-lg tex-center"> ...loading </div>}
+        {!loading && (
+          <div>
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 md:grid-cols-3">
+              {surveys.map((survey) => {
+                return (
+                  <SurveyListItem
+                    survey={survey}
+                    key={survey?.id}
+                    onDeleteClick={onDeleteClick}
+                  />
+                );
+              })}
+            </div>
+            <PaginationLinks meta={meta} onPageClick={onPageClick} />
+          </div>
+        )}
       </PageComponent>
     </>
   );
