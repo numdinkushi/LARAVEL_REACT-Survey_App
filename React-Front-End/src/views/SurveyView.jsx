@@ -45,8 +45,6 @@ export const SurveyView = () => {
       });
   };
 
-  const addQuestion = () => {};
-
   const onImageChoose = (event) => {
     const file = event.target.files[0];
 
@@ -63,8 +61,11 @@ export const SurveyView = () => {
     reader.readAsDataURL(file);
   };
 
-  const onSurveyUpdate = (survey) =>{
-      setSurvey({...survey});
+  const onQuestionsUpdate = (questions) =>{
+      setSurvey({
+        ...survey,
+        questions
+      });
   };
 
   return (
@@ -192,14 +193,12 @@ export const SurveyView = () => {
               </div>
             </div>
             {/*Active*/}
-                  <SurveyQuestions survey={survey} onSurveyUpdate={onSurveyUpdate}/>
-            <button type="button" onClick={addQuestion}>
-              Add question
-            </button>
-            {/* <SurveyQuestions
+                  {/* <SurveyQuestions survey={survey} onQuestionsUpdate={onQuestionsUpdate}/> */}
+ 
+            <SurveyQuestions
                 questions={survey.questions}
                 onQuestionsUpdate={onQuestionsUpdate}
-              /> */}
+              />
           </div>
           <div className="bg-gray-50 px-4 py-3 text-right sm:px-6">
             <PrimaryButton>Save</PrimaryButton>

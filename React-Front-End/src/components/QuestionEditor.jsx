@@ -12,9 +12,10 @@ export const QuestionEditor = ({
     const [model, setModel] = useState({...question});
     const {questionTypes} = useStateContext();
 
-    useEffect(() => {
-        
-    }, [model])
+    
+  useEffect(() => {
+    questionChange(model);
+  }, [model]);
 
     const upperCaseFirst = (str) => {
         return str.charAt(0).toUpperCase() + str.slice(1);

@@ -1,4 +1,4 @@
-import { Fragment } from "react";
+import { Fragment, useEffect } from "react";
 import { Disclosure, Menu, Transition } from "@headlessui/react";
 import {
   Bars3Icon,
@@ -35,6 +35,16 @@ export function DefaultLayout() {
     })
     console.log(24324);
   };
+
+  useEffect(()=>{
+    axiosClient.get('/me')
+    .then(({data})=>{
+
+    })
+    .catch((error)=>{
+
+    });
+  }, [])
   return (
     <>
       <div className="min-h-full">
