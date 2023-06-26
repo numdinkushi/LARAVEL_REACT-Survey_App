@@ -39,7 +39,8 @@ export const PaginationLinks = ({ meta, onPageClick }) => {
           </p>
         </div>
         <div>
-          <nav
+          {
+            meta.total > meta.per_page &&   <nav
             className="isolate inline-flex -space-x-px rounded-md shadow-sm"
             aria-label="Pagination"
           >
@@ -68,6 +69,8 @@ export const PaginationLinks = ({ meta, onPageClick }) => {
                 );
               })}
           </nav>
+          }
+        
         </div>
       </div>
     </div>

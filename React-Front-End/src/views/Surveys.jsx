@@ -5,14 +5,23 @@ import { SurveyListItem } from "../components/SurveyListItem";
 import { PrimaryButton } from "../components/core/PrimaryButton";
 import { PlusCircleIcon } from "@heroicons/react/24/outline";
 import axiosClient from "../axios";
+import { useNavigate } from "react-router-dom";
 
 export const Surveys = () => {
   const [surveys, setSurveys] = useState([]);
   const [loading, setLoading] = useState(false);
   const [meta, setMeta] = useState({});
+  const navigate = useNavigate();
+  const { toast, showToast } = useStateContext();
 
-  const onDeleteClick = () => {
-    console.log(surveys);
+  const onDeleteClick = (id) => {
+    if(window.confirm("Are you sure you want to deletet this survey?")){
+      axiosClient.delete(`/survey/${id}`)
+      .then(()=>{
+        getSurveys();
+        showToast("Survey successfully deleted.");
+      })
+    }
   };
 
   const onPageClick = (link) => {
@@ -54,6 +63,11 @@ export const Surveys = () => {
         {loading && <div className="tex-lg tex-center"> ...loading </div>}
         {!loading && (
           <div>
+            {surveys.length === 0 && (
+            <div className="py-8 text-center text-gray-700">
+              You don't have surveys created
+            </div>
+          )}
             <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 md:grid-cols-3">
               {surveys.map((survey) => {
                 return (
@@ -65,7 +79,7 @@ export const Surveys = () => {
                 );
               })}
             </div>
-            <PaginationLinks meta={meta} onPageClick={onPageClick} />
+            {surveys.length > 0 && ( <PaginationLinks meta={meta} onPageClick={onPageClick} /> )}
           </div>
         )}
       </PageComponent>
