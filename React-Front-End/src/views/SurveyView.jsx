@@ -4,6 +4,7 @@ import { PrimaryButton } from "../components/core/PrimaryButton";
 import { PhotoIcon, PlusCircleIcon } from "@heroicons/react/24/outline";
 import { useNavigate, useParams } from "react-router-dom";
 import axiosClient from "../axios";
+import { useStateContext } from "../context/ContexProvider";
 
 export const SurveyView = () => {
   const [survey, setSurvey] = useState({
@@ -19,6 +20,7 @@ export const SurveyView = () => {
 
   const [errors, setErrors] = useState({ __html: "" });
   const [loading, setLoading] = useState(false);
+  const { showToast } = useStateContext();
 
   const navigate = useNavigate();
   const { id } = useParams();
@@ -46,6 +48,11 @@ export const SurveyView = () => {
     res
       .then((res) => {
         navigate("/surveys");
+        if(id){
+          showToast('Survey successfully updated' );
+        }else{
+          showToast('Survey successfully created' );
+        }
       })
       .catch((error) => {
         if (error && error.response) {
