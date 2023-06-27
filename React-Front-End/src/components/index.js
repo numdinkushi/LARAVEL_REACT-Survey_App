@@ -7,3 +7,4 @@ export { PaginationLinks } from "./PaginationLinks";
 export { Toast } from "./Toast";
 export { NavComponent } from "./NavComponent";
 export { PublicQuestionView } from "./PublicQuestionView";
+export { DashboardCard } from "./DashboardCard";
