@@ -8,6 +8,9 @@ export const SurveyPublicView = () => {
     const [loading, setLoading] = useState(false);
     const {slug} = useParams();
 
+    const answers = {};
+    const [surveyFinished, setSurveyFinished] = useState(false);
+
     useEffect(() => {
         setLoading(true)
         axiosClient.get(`/survey/get-by-slug/${slug}`)
@@ -19,6 +22,24 @@ export const SurveyPublicView = () => {
         });
     }, [])
     
+    function answerChanged(question, value) {
+        answers[question.id] = value;
+        console.log(question, value);
+      }
+      function onSubmit(ev) {
+        ev.preventDefault();
+    
+        console.log(answers);
+        axiosClient
+        //   .post(`/survey/${survey.id}/answer`, {
+        //     answers,
+        //   })
+        //   .then((response) => {
+        //     debugger;
+        //     setSurveyFinished(true);
+        //   });
+      }
+
     return (
         <div>
           {loading && <div className="flex justify-center">Loading..</div>}
@@ -51,7 +72,7 @@ export const SurveyPublicView = () => {
                         key={question.id}
                         question={question}
                         index={index}
-                        // answerChanged={(val) => answerChanged(question, val)}
+                        answerChanged={(val) => answerChanged(question, val)}
                       />
                     ))}
                   </div>
