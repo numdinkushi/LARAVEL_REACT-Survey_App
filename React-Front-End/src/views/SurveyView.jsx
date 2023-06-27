@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { PageComponent, SurveyQuestions } from "../components";
 import { PrimaryButton } from "../components/core/PrimaryButton";
-import { PhotoIcon, PlusCircleIcon } from "@heroicons/react/24/outline";
+import { PhotoIcon, LinkIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { useNavigate, useParams } from "react-router-dom";
 import axiosClient from "../axios";
 import { useStateContext } from "../context/ContexProvider";
@@ -48,10 +48,10 @@ export const SurveyView = () => {
     res
       .then((res) => {
         navigate("/surveys");
-        if(id){
-          showToast('Survey successfully updated' );
-        }else{
-          showToast('Survey successfully created' );
+        if (id) {
+          showToast("Survey successfully updated");
+        } else {
+          showToast("Survey successfully created");
         }
       })
       .catch((error) => {
@@ -85,6 +85,10 @@ export const SurveyView = () => {
     });
   };
 
+  function onDelete(){
+
+  }
+
   useEffect(() => {
     if (id) {
       setLoading(true);
@@ -95,7 +99,22 @@ export const SurveyView = () => {
     }
   }, []);
   return (
-    <PageComponent title={!id ? "Create New Survey" : "Update Survey"}>
+    <PageComponent
+      title={!id ? "Create New Survey" : "Update Survey"}
+      buttons={
+        <div className="flex gap-2">
+      <PrimaryButton color="green" href={`/survey/public/${survey.slug}`}>
+            <LinkIcon className="h-4 w-4 mr-2" />
+            Public Link
+          </PrimaryButton>
+          <PrimaryButton color="red" onClick={onDelete}>
+            <TrashIcon className="h-4 w-4 mr-2" />
+            Delete
+          </PrimaryButton>
+        </div>
+      
+      }
+    >
       {loading && <div className="text-lg text-center"> Loading... </div>}
       {!loading && (
         <form action="#" method="POST" onSubmit={(event) => onSubmit(event)}>
