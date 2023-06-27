@@ -31,13 +31,12 @@ export const SurveyPublicView = () => {
     
         console.log(answers);
         axiosClient
-        //   .post(`/survey/${survey.id}/answer`, {
-        //     answers,
-        //   })
-        //   .then((response) => {
-        //     debugger;
-        //     setSurveyFinished(true);
-        //   });
+          .post(`/survey/${survey.id}/answer`, {
+            answers,
+          })
+          .then((response) => {
+            setSurveyFinished(true);
+          });
       }
 
     return (
@@ -59,12 +58,12 @@ export const SurveyPublicView = () => {
                 </div>
               </div>
     
-              {/* {surveyFinished && (
+              {surveyFinished && (
                 <div className="py-8 px-6 bg-emerald-500 text-white w-[600px] mx-auto">
                   Thank you for participating in the survey
                 </div>
-              )} */}
-              {/* {!surveyFinished && ( */}
+              )}
+              {!surveyFinished && (
                 <>
                   <div>
                     {survey.questions && survey.questions.map((question, index) => (
@@ -83,7 +82,7 @@ export const SurveyPublicView = () => {
                     Submit
                   </button>
                 </>
-              {/* )} */}
+             )} 
             </form>
           )}
         </div>
