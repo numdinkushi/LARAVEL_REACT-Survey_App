@@ -1,5 +1,5 @@
 import { Navigate, createBrowserRouter } from "react-router-dom";
-import { Dashboard, Login, SignUp, SurveyView, Surveys } from "./views";
+import { Dashboard, Login, SignUp, SurveyPublicView, SurveyView, Surveys } from "./views";
 import { GuestLayout } from "./components";
 import {DefaultLayout} from "./components/DefaultLayout";
 
@@ -22,8 +22,8 @@ const router = createBrowserRouter([
             },
             {
                 path: "/surveys/:id",
-                element: <SurveyView />
-            },
+                element: <SurveyView />,
+              },
             {
                 path: "/surveys/create",
                 element: <SurveyView />
@@ -43,8 +43,11 @@ const router = createBrowserRouter([
                 element: <SignUp />
             },
         ]
-    }
-
+    },
+    {
+        path: "/survey/public/:slug",
+        element: <SurveyPublicView />
+    },
 ]);
 
 export default router;

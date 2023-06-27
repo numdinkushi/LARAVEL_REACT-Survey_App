@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useStateContext } from "../context/ContexProvider";
 import { PlusIcon, TrashIcon } from "@heroicons/react/24/outline";
+import { v4 as uuidv4 } from "uuid";
 
 export const QuestionEditor = ({
     index = 0,
@@ -20,7 +21,42 @@ export const QuestionEditor = ({
     const upperCaseFirst = (str) => {
         return str.charAt(0).toUpperCase() + str.slice(1);
     }
+
+
+  function shouldHaveOptions(type = null) {
+    type = type || model.type;
+    return ["select", "radio", "checkbox"].includes(type);
+  }
     
+  function onTypeChange(ev) {
+    const newModel = {
+      ...model,
+      type: ev.target.value,
+    };
+    if (!shouldHaveOptions(model.type) && shouldHaveOptions(ev.target.value)) {
+      if (!model.data.options) {
+        newModel.data = {
+          options: [{ uuid: uuidv4(), text: "" }],
+        };
+      }
+    }
+    setModel(newModel);
+  }
+
+  function addOption() {
+    model.data.options.push({
+      uuid: uuidv4(),
+      text: "",
+    });
+    setModel({ ...model });
+  }
+
+
+  function deleteOption(op) {
+    model.data.options = model.data.options.filter(option => option.uuid != op.uuid)
+    setModel({...model})
+  }
+
   return (
     <>
     <div>
@@ -102,7 +138,7 @@ export const QuestionEditor = ({
             id="questionType"
             name="questionType"
             value={model.type}
-            onChange={(event) => setModel({...model, type: event.target.value})}
+            onChange={onTypeChange}
             className="mt-1 block w-full rounded-md border border-gray-300 bg-white py-2 px-3 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
           >
             {questionTypes.map((type) => (
@@ -114,7 +150,6 @@ export const QuestionEditor = ({
         </div>
         {/* Question Type */}
       </div>
-
       {/*Description*/}
       <div className="mb-3">
         <label
@@ -136,7 +171,7 @@ export const QuestionEditor = ({
       {/*Description*/}
 
       <div>
-        {/* {shouldHaveOptions() && (
+        {shouldHaveOptions() && (
           <div>
             <h4 className="text-sm font-semibold mb-1 flex justify-between items-center ">
               Options
@@ -202,7 +237,7 @@ export const QuestionEditor = ({
               </div>
             )}
           </div>
-        )} */}
+        )}
       </div>
       {model.type === "select" && <div></div>}
     </div>
